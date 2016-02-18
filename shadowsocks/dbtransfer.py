@@ -88,7 +88,12 @@ class DbTransfer(object):
         conn = cymysql.connect(host=config.MYSQL_HOST, port=config.MYSQL_PORT, user=config.MYSQL_USER,
                                passwd=config.MYSQL_PASS, db=config.MYSQL_DB, charset='utf8')
         cur = conn.cursor()
-        cur.execute("SELECT port, u, d, transfer_enable, passwd, switch, enable FROM user")
+
+        sql_where = 'WHERE server_group = %s' % config.SERVER_GROUP
+        if  config.ALLOW_USER_TYPE != 'any' :
+            sql_where += ' AND user_type = %s' % config.ALLOW_USER_TYPE
+
+        cur.execute("SELECT port, u, d, transfer_enable, passwd, switch, enable FROM user "+sql_where)
         rows = []
         for r in cur.fetchall():
             rows.append(list(r))
